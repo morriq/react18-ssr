@@ -1,15 +1,13 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { resolve } = require("path");
+const { merge } = require("webpack-merge");
+const nodeExternals = require("webpack-node-externals");
 
 module.exports = () => {
   const config = {
-    output: {
-      library: ["app"],
-    },
     resolve: {
       modules: [resolve(__dirname), "node_modules"],
-
       extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     plugins: [
@@ -49,5 +47,23 @@ module.exports = () => {
     },
   };
 
-  return [config];
+  const client = merge(config, {
+    entry: resolve(__dirname, "src/client"),
+    output: {
+      library: ["app"],
+    },
+  });
+  const server = merge(config, {
+    entry: resolve(__dirname, "src/server"),
+    output: {
+      filename: "server.js",
+      library: {
+        type: "commonjs2",
+      },
+    },
+    externals: [nodeExternals()],
+    target: "node",
+  });
+
+  return [client, server];
 };
