@@ -1,4 +1,0 @@
-- dev ssr
-- include hmrs and rebuilds
-- react final app
-- routes in app

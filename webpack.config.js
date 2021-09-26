@@ -10,10 +10,7 @@ module.exports = () => {
       modules: [resolve(__dirname), "node_modules"],
       extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
-    plugins: [
-      new HtmlWebpackPlugin({ inject: "body" }),
-      new MiniCssExtractPlugin(),
-    ],
+    plugins: [new MiniCssExtractPlugin()],
     module: {
       rules: [
         {
@@ -52,6 +49,13 @@ module.exports = () => {
     output: {
       library: ["app"],
     },
+    plugins: [
+      new HtmlWebpackPlugin({
+        inject: "body",
+        template: resolve(__dirname, "src/template.ejs"),
+        filename: "template.html",
+      }),
+    ],
   });
   const server = merge(config, {
     entry: resolve(__dirname, "src/server"),

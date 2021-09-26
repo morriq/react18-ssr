@@ -1,10 +1,14 @@
 import { css } from "@linaria/core";
 import { ReactElement } from "react";
+import { useData } from "src/providers/Data";
 
-const test = css`
+const hello = css`
   color: blue;
 `;
 
 export default function App(): ReactElement {
-  return <span className={test}>hello</span>;
+  const data = useData();
+
+  console.log(data);
+  return <span className={hello}>hello</span>;
 }

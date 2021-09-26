@@ -4,13 +4,14 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "nodemon server/index.js --watch server",
     "build": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "eval": "0.1.6",
     "express": "4.17.1",
     "react": "18.0.0-alpha-d174d063d-20210922",
     "react-dom": "18.0.0-alpha-d174d063d-20210922"
@@ -31,6 +32,7 @@
     "css-loader": "6.3.0",
     "html-webpack-plugin": "5.3.2",
     "mini-css-extract-plugin": "2.3.0",
+    "nodemon": "2.0.13",
     "webpack": "5.53.0",
     "webpack-cli": "4.8.0",
     "webpack-dev-middleware": "5.1.0",
