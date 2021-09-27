@@ -1,10 +1,9 @@
-import ReactDOM from "react-dom";
+import { hydrate } from "react-dom";
 import App from "src/App";
 
 function bootstrap() {
-  // @ts-ignore
-  const root = ReactDOM.createRoot(document.getElementById("app"));
-  root.render(<App />);
+  const root = document.getElementById("app");
+  hydrate(<App />, root);
 }
 
 export { bootstrap };

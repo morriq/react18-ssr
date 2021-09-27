@@ -32,22 +32,47 @@ const render = ({ template, response, bundle }) => {
 
 function developmentMode() {
   const webpack = require("webpack");
-  const middleware = require("webpack-dev-middleware");
+  const webpackDevMiddleware = require("webpack-dev-middleware");
+  const webpackHotMiddleware = require("webpack-hot-middleware");
+  const { mergeWithCustomize, customizeArray } = require("webpack-merge");
   const webpackConfig = require("../webpack.config")();
   const _eval = require("eval");
+
   const compiler = webpack(
-    webpackConfig.map((config) => ({ ...config, mode: "development" }))
+    webpackConfig
+      .map((config) => ({ ...config, mode: "development" }))
+      .map((config) =>
+        config.name === "server"
+          ? config
+          : mergeWithCustomize({
+              customizeArray: customizeArray({
+                "entry.*": "prepend",
+              }),
+            })(config, {
+              entry: [
+                "webpack-hot-middleware/client?name=client&path=/__webpack_hmr",
+              ],
+              plugins: [new webpack.HotModuleReplacementPlugin()],
+            })
+      )
   );
 
   const router = new Router();
 
-  router.use(middleware(compiler, { serverSideRender: true }));
+  router.use(
+    webpackDevMiddleware(compiler, {
+      serverSideRender: true,
+    })
+  );
+  router.use(webpackHotMiddleware(compiler, { name: "client" }));
   router.get("/", (request, response) => {
     const { devMiddleware } = response.locals.webpack;
     const outputFileSystem = devMiddleware.outputFileSystem;
     const jsonWebpackStats = devMiddleware.stats.toJson();
 
-    const { outputPath } = jsonWebpackStats.children[0];
+    const { outputPath } = jsonWebpackStats.children.find(
+      ({ name }) => name === "server"
+    );
 
     const bundle = _eval(
       outputFileSystem.readFileSync(join(outputPath, "server.js"), "utf-8"),

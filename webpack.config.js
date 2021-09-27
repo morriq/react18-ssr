@@ -45,9 +45,16 @@ module.exports = () => {
   };
 
   const client = merge(config, {
-    entry: resolve(__dirname, "src/client"),
+    name: "client",
+    entry: ["react-hot-loader/patch", resolve(__dirname, "src/client")],
     output: {
-      library: ["app"],
+      filename: "[name].[contenthash].bundle.js",
+      library: ["application"],
+    },
+    resolve: {
+      alias: {
+        "react-dom": "@hot-loader/react-dom",
+      },
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -58,7 +65,8 @@ module.exports = () => {
     ],
   });
   const server = merge(config, {
-    entry: resolve(__dirname, "src/server"),
+    name: "server",
+    entry: [resolve(__dirname, "src/server")],
     output: {
       filename: "server.js",
       library: {
