@@ -1,13 +1,9 @@
-import { StaticRouter } from "react-router-dom";
-import App from "src/App";
+import { Route, StaticRouter, Switch } from "react-router-dom";
 import routes from "src/routes";
+import Home from "src/routes/Home";
+import Offer from "src/routes/Offer";
 
-interface Properties {
-  location: string;
-  state: Object;
-}
-
-function render({ state, location }: Properties) {
+function render({ state, location }) {
   return (
     <StaticRouter location={location}>
       <script
@@ -18,7 +14,10 @@ function render({ state, location }: Properties) {
         }}
       />
       <div id="app">
-        <App state={state} />
+        <Switch>
+          <Route path={"/"} exact render={() => <Home {...state} />} />
+          <Route path={"/offer"} exact render={() => <Offer {...state} />} />
+        </Switch>
       </div>
     </StaticRouter>
   );

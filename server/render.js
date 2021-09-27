@@ -22,9 +22,14 @@ function developmentMode() {
                 "entry.*": "prepend",
               }),
             })(config, {
-              entry: [
-                "webpack-hot-middleware/client?name=client&path=/__webpack_hmr",
-              ],
+              entry: {
+                home: [
+                  "webpack-hot-middleware/client?name=client&path=/__webpack_hmr",
+                ],
+                offer: [
+                  "webpack-hot-middleware/client?name=client&path=/__webpack_hmr",
+                ],
+              },
               plugins: [new webpack.HotModuleReplacementPlugin()],
             })
       )
@@ -49,12 +54,10 @@ function developmentMode() {
         true
       );
 
-      const template = outputFileSystem.readFileSync(
-        join(outputPath, "template.html"),
-        "utf-8"
-      );
+      const getTemplate = (filename) =>
+        outputFileSystem.readFileSync(join(outputPath, filename), "utf-8");
 
-      response.locals.template = template;
+      response.locals.getTemplate = getTemplate;
       response.locals.bundle = bundle;
       next();
     },
@@ -66,15 +69,13 @@ function productionMode() {
   const express = require("express");
 
   const bundle = require("../dist/server");
-  const template = readFileSync(
-    join(__dirname, "../dist/template.html"),
-    "utf-8"
-  );
+  const getTemplate = (filename) =>
+    readFileSync(join(__dirname, "../dist/", filename), "utf-8");
 
   return [
     express.static(join(__dirname, "../dist"), { index: false }),
     (request, response, next) => {
-      response.locals.template = template;
+      response.locals.getTemplate = getTemplate;
       response.locals.bundle = bundle;
       next();
     },
@@ -88,15 +89,17 @@ router.use(
 );
 
 router.get("*", (request, response, next) => {
-  const { template, bundle } = response.locals;
-
-  const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
+  const { getTemplate, bundle } = response.locals;
 
   const route = bundle.routes.find((route) => matchPath(request.path, route));
 
   if (!route) {
     return next();
   }
+
+  const [startDocument, bodyTag, endDocument] = getTemplate(
+    route.template
+  ).split(/(\<body.*?\>)/);
 
   route
     .beforeHeadersResponse(request, response)
