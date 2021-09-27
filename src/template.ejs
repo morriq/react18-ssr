@@ -8,7 +8,11 @@
   </head>
   <body>
     <script>
-      window.onload = () => application.bootstrap();
+      window.onload = () =>
+        application.bootstrap({
+          scope: window,
+          key: "INITIAL_STATE",
+        });
     </script>
   </body>
 </html>

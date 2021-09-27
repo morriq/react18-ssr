@@ -1,20 +1,7 @@
 const { Router } = require("express");
 const { join } = require("path");
 const { renderToNodeStream } = require("react-dom/server");
-
-const render = ({ template, response, bundle }) => {
-  const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
-
-  response.type("html").write(startDocument);
-  response.write(bodyTag);
-
-  const stream = renderToNodeStream(bundle.render());
-  stream.pipe(response, { end: false });
-
-  stream.on("end", () => {
-    response.end(endDocument);
-  });
-};
+const { matchPath } = require("react-router-dom");
 
 function developmentMode() {
   const webpack = require("webpack");
@@ -43,57 +30,106 @@ function developmentMode() {
       )
   );
 
-  const router = new Router();
-
-  router.use(
+  return [
     webpackDevMiddleware(compiler, {
       serverSideRender: true,
-    })
-  );
-  router.use(webpackHotMiddleware(compiler, { name: "client" }));
-  router.get("/", (request, response) => {
-    const { devMiddleware } = response.locals.webpack;
-    const outputFileSystem = devMiddleware.outputFileSystem;
-    const jsonWebpackStats = devMiddleware.stats.toJson();
+    }),
+    webpackHotMiddleware(compiler, { name: "client" }),
+    (request, response, next) => {
+      const { devMiddleware } = response.locals.webpack;
+      const outputFileSystem = devMiddleware.outputFileSystem;
+      const jsonWebpackStats = devMiddleware.stats.toJson();
 
-    const { outputPath } = jsonWebpackStats.children.find(
-      ({ name }) => name === "server"
-    );
+      const { outputPath } = jsonWebpackStats.children.find(
+        ({ name }) => name === "server"
+      );
 
-    const bundle = _eval(
-      outputFileSystem.readFileSync(join(outputPath, "server.js"), "utf-8"),
-      true
-    );
+      const bundle = _eval(
+        outputFileSystem.readFileSync(join(outputPath, "server.js"), "utf-8"),
+        true
+      );
 
-    const template = outputFileSystem.readFileSync(
-      join(outputPath, "template.html"),
-      "utf-8"
-    );
+      const template = outputFileSystem.readFileSync(
+        join(outputPath, "template.html"),
+        "utf-8"
+      );
 
-    render({ template, response, bundle });
-  });
-
-  return router;
+      response.locals.template = template;
+      response.locals.bundle = bundle;
+      next();
+    },
+  ];
 }
 
 function productionMode() {
   const { readFileSync } = require("fs");
   const express = require("express");
 
-  const router = new Router();
   const bundle = require("../dist/server");
   const template = readFileSync(
     join(__dirname, "../dist/template.html"),
     "utf-8"
   );
 
-  router.use(express.static(join(__dirname, "../dist"), { index: false }));
-  router.get("/", (request, response) => {
-    render({ template, response, bundle });
-  });
-
-  return router;
+  return [
+    express.static(join(__dirname, "../dist"), { index: false }),
+    (request, response, next) => {
+      response.locals.template = template;
+      response.locals.bundle = bundle;
+      next();
+    },
+  ];
 }
 
-module.exports =
-  process.env.NODE_ENV === "production" ? productionMode() : developmentMode();
+const router = new Router();
+
+router.use(
+  process.env.NODE_ENV === "production" ? productionMode() : developmentMode()
+);
+
+router.get("*", (request, response, next) => {
+  const { template, bundle } = response.locals;
+
+  const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
+
+  const route = bundle.routes.find((route) => matchPath(request.path, route));
+
+  if (!route) {
+    return next();
+  }
+
+  route
+    .beforeHeadersResponse(request, response)
+    .then((beforeHeadersData) => {
+      if (response.headersSent) {
+        return;
+      }
+
+      response.type("html").write(startDocument);
+      response.write(bodyTag);
+
+      return route
+        .afterHeadersResponse(request, beforeHeadersData)
+        .then((state) => {
+          const stream = renderToNodeStream(
+            bundle.render({ state, location: request.url })
+          );
+          stream.pipe(response, { end: false });
+
+          stream.on("error", (error) => {
+            console.error(error);
+            response.write("failed serving html");
+            response.end(endDocument);
+          });
+          stream.on("end", () => {
+            response.end(endDocument);
+          });
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+      response.end("failed fetching data");
+    });
+});
+
+module.exports = router;

@@ -1,16 +1,27 @@
+import { StaticRouter } from "react-router-dom";
 import App from "src/App";
-import { DataProvider } from "src/providers/Data";
+import routes from "src/routes";
 
-function render() {
-  const data = {};
+interface Properties {
+  location: string;
+  state: Object;
+}
 
+function render({ state, location }: Properties) {
   return (
-    <DataProvider data={data}>
+    <StaticRouter location={location}>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+      window.INITIAL_STATE = ${JSON.stringify(state).replace(/</g, "\\u003c")}
+      `,
+        }}
+      />
       <div id="app">
-        <App />
+        <App state={state} />
       </div>
-    </DataProvider>
+    </StaticRouter>
   );
 }
 
-export { render };
+export { render, routes };

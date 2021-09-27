@@ -1,16 +1,25 @@
-import { css } from "@linaria/core";
 import { ReactElement } from "react";
 import { hot } from "react-hot-loader/root";
-import { useData } from "src/providers/Data";
+import { Route, Switch } from "react-router-dom";
+import routes from "src/routes";
 
-const hello = css`
-  color: blue;
-`;
+interface Properties {
+  state: {};
+}
 
-function App(): ReactElement {
-  const data = useData();
-
-  return <span className={hello}>hello {JSON.stringify(data)}</span>;
+function App({ state }: Properties): ReactElement {
+  return (
+    <Switch>
+      {routes.map(({ path, exact, component: Component }) => (
+        <Route
+          key={path}
+          path={path}
+          exact={exact}
+          render={() => <Component {...state} />}
+        />
+      ))}
+    </Switch>
+  );
 }
 
 export default hot(App);
