@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { ReactElement } from "react";
 import Home from "src/routes/Home";
 import Offer from "src/routes/Offer";
-
 interface Route {
   path: string;
   exact: boolean;

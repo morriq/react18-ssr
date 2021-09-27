@@ -1,5 +1,6 @@
 import { css } from "@linaria/core";
 import { ReactElement } from "react";
+import { Link } from "react-router-dom";
 import StateContainer from "src/containers/StateContainer";
 import { OfferProvider } from "src/providers/Offer";
 
@@ -14,6 +15,7 @@ export default function Offer({ offer }): ReactElement {
         <div>offer</div>
         <StateContainer />
       </div>
+      <Link to="/">go to home</Link>
     </OfferProvider>
   );
 }
