@@ -1,33 +1,19 @@
 const { Router } = require("express");
 const { join } = require("path");
-const { pipeToNodeWritable } = require("react-dom/server");
+const { renderToNodeStream } = require("react-dom/server");
 
 const render = ({ template, response, bundle }) => {
   const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
-  let didError = false;
-  const { startWriting, abort } = pipeToNodeWritable(
-    bundle.render(),
-    response,
-    {
-      onCompleteAll() {
-        response.write(endDocument);
-      },
-      onReadyToStream() {
-        // If something errored before we started streaming, we set the error code appropriately.
-        response.statusCode = didError ? 500 : 200;
-        response.setHeader("Content-type", "text/html");
-        response.write(startDocument);
-        response.write(bodyTag);
-        startWriting();
-      },
-      onError(error) {
-        didError = true;
-        console.error(error);
-      },
-    }
-  );
 
-  setTimeout(abort, 3000);
+  response.type("html").write(startDocument);
+  response.write(bodyTag);
+
+  const stream = renderToNodeStream(bundle.render());
+  stream.pipe(response, { end: false });
+
+  stream.on("end", () => {
+    response.end(endDocument);
+  });
 };
 
 function developmentMode() {
