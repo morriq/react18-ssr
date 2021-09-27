@@ -29,24 +29,23 @@ function render({ state, location }: Properties) {
   );
 }
 
-const routes = clientRoutes.map(({ filename, ...route }) => {
+const prefetchRoutes = [
+  {
+    filename: "Home",
+    afterHeadersResponse,
+    beforeHeadersResponse,
+  },
+  {
+    filename: "Offer",
+    afterHeadersResponse: offerAfterHeadersResponse,
+    beforeHeadersResponse: offerBeforeHeadersResponse,
+  },
+];
+
+const routes = clientRoutes.map((route) => {
   return {
-    filename,
     ...route,
-    ...{
-      [filename]: {
-        async afterHeadersResponse() {},
-        async beforeHeadersResponse() {},
-      },
-      Home: {
-        afterHeadersResponse,
-        beforeHeadersResponse,
-      },
-      Offer: {
-        afterHeadersResponse: offerAfterHeadersResponse,
-        beforeHeadersResponse: offerBeforeHeadersResponse,
-      },
-    }[filename],
+    ...prefetchRoutes.find(({ filename }) => filename === route.filename),
   };
 });
 
