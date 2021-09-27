@@ -8,6 +8,22 @@ const red = css`
   color: red;
 `;
 
+async function beforeHeadersResponse() {
+  return {};
+}
+
+async function afterHeadersResponse() {
+  return {
+    offers: [
+      {
+        id: 1,
+        title: "",
+        salary: 0,
+      },
+    ],
+  };
+}
+
 export default function Home({ offers }): ReactElement {
   return (
     <OffersProvider offers={offers}>
@@ -19,3 +35,5 @@ export default function Home({ offers }): ReactElement {
     </OffersProvider>
   );
 }
+
+export { beforeHeadersResponse, afterHeadersResponse };

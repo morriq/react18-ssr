@@ -8,6 +8,20 @@ const blue = css`
   color: blue;
 `;
 
+async function beforeHeadersResponse() {
+  return {};
+}
+
+async function afterHeadersResponse() {
+  return {
+    offer: {
+      id: 1,
+      title: "",
+      salary: 0,
+    },
+  };
+}
+
 export default function Offer({ offer }): ReactElement {
   return (
     <OfferProvider offer={offer}>
@@ -19,3 +33,5 @@ export default function Offer({ offer }): ReactElement {
     </OfferProvider>
   );
 }
+
+export { beforeHeadersResponse, afterHeadersResponse };

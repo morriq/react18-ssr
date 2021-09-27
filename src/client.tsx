@@ -13,7 +13,7 @@ function bootstrap({ scope, key }: Properties) {
   delete scope[key];
 
   hydrate(
-    <BrowserRouter>
+    <BrowserRouter forceRefresh>
       <App state={state} />
     </BrowserRouter>,
     root

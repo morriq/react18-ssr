@@ -3,7 +3,12 @@ module.exports = ({ cache }) => {
   const plugins = ["react-hot-loader/babel", "@babel/plugin-transform-runtime"];
 
   const presets = [
-    "@babel/env",
+    [
+      "@babel/env",
+      {
+        modules: false,
+      },
+    ],
     "@babel/typescript",
     [
       "@babel/react",
