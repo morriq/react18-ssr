@@ -36,7 +36,7 @@ function createServerData() {
             "I like marshmallows",
           ]);
           resolve();
-        }, 2000);
+        }, 100);
       });
       throw promise;
     },

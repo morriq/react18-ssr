@@ -51,7 +51,7 @@ module.exports = () => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        inject: "body",
+        inject: "head",
         template: resolve(__dirname, "src/template.ejs"),
         filename: "template.html",
       }),
