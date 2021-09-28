@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "cross-env NODE_ENV=production nodemon server/index.js --watch server",
+    "start": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
     "build": "cross-env NODE_ENV=production webpack --mode production"
   },
   "keywords": [],
