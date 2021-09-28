@@ -1,8 +1,6 @@
 import { StaticRouter } from "react-router-dom";
 import App from "src/App";
-import clientRoutes from "src/routes";
-import * as Home from "src/routes/Home";
-import * as Offer from "src/routes/Offer";
+import routes from "src/routes";
 
 interface Properties {
   location: string;
@@ -25,25 +23,5 @@ function render({ state, location }: Properties) {
     </StaticRouter>
   );
 }
-
-const prefetchRoutes = [
-  {
-    filename: "Home",
-    afterHeadersResponse: Home.afterHeadersResponse,
-    beforeHeadersResponse: Home.beforeHeadersResponse,
-  },
-  {
-    filename: "Offer",
-    afterHeadersResponse: Offer.afterHeadersResponse,
-    beforeHeadersResponse: Offer.beforeHeadersResponse,
-  },
-];
-
-const routes = clientRoutes.map((route) => {
-  return {
-    ...route,
-    ...prefetchRoutes.find(({ filename }) => filename === route.filename),
-  };
-});
 
 export { render, routes };

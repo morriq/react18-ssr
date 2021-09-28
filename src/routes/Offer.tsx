@@ -8,19 +8,23 @@ const blue = css`
   color: blue;
 `;
 
-async function beforeHeadersResponse() {
-  return {};
-}
+const beforeHeadersResponse = process.env.IS_BROWSER
+  ? async () => {}
+  : async function () {
+      return {};
+    };
 
-async function afterHeadersResponse() {
-  return {
-    offer: {
-      id: 1,
-      title: "",
-      salary: 0,
-    },
-  };
-}
+const afterHeadersResponse = process.env.IS_BROWSER
+  ? async () => {}
+  : async function () {
+      return {
+        offer: {
+          id: 1,
+          title: "",
+          salary: 0,
+        },
+      };
+    };
 
 export default function Offer({ offer }): ReactElement {
   return (

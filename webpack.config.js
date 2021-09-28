@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { resolve } = require("path");
 const { merge } = require("webpack-merge");
 const nodeExternals = require("webpack-node-externals");
+const webpack = require("webpack");
 
 module.exports = () => {
   const config = {
@@ -57,6 +58,9 @@ module.exports = () => {
       },
     },
     plugins: [
+      new webpack.EnvironmentPlugin({
+        IS_BROWSER: true,
+      }),
       new HtmlWebpackPlugin({
         inject: "head",
         template: resolve(__dirname, "src/template.ejs"),
@@ -74,6 +78,11 @@ module.exports = () => {
       },
     },
     externals: [nodeExternals()],
+    plugins: [
+      new webpack.EnvironmentPlugin({
+        IS_BROWSER: false,
+      }),
+    ],
     target: "node",
   });
 

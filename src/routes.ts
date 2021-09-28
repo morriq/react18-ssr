@@ -1,25 +1,22 @@
-import { ReactElement } from "react";
-import Home from "src/routes/Home";
-import Offer from "src/routes/Offer";
-interface Route {
-  filename: string;
-  path: string;
-  exact: boolean;
-  component: (state: any) => ReactElement;
-}
+import * as Home from "src/routes/Home";
+import * as Offer from "src/routes/Offer";
 
-const routes: Route[] = [
+const routes = [
   {
     filename: "Home",
     path: "/",
     exact: true,
-    component: Home,
+    component: Home.default,
+    afterHeadersResponse: Home.afterHeadersResponse,
+    beforeHeadersResponse: Home.beforeHeadersResponse,
   },
   {
     filename: "Offer",
     path: "/offer",
     exact: false,
-    component: Offer,
+    component: Offer.default,
+    afterHeadersResponse: Offer.afterHeadersResponse,
+    beforeHeadersResponse: Offer.beforeHeadersResponse,
   },
 ];
 

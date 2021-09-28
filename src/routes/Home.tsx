@@ -8,21 +8,25 @@ const red = css`
   color: red;
 `;
 
-async function beforeHeadersResponse() {
-  return {};
-}
+const beforeHeadersResponse = process.env.IS_BROWSER
+  ? async () => {}
+  : async function () {
+      return {};
+    };
 
-async function afterHeadersResponse() {
-  return {
-    offers: [
-      {
-        id: 1,
-        title: "",
-        salary: 0,
-      },
-    ],
-  };
-}
+const afterHeadersResponse = process.env.IS_BROWSER
+  ? async () => {}
+  : async function () {
+      return {
+        offers: [
+          {
+            id: 1,
+            title: "",
+            salary: 0,
+          },
+        ],
+      };
+    };
 
 export default function Home({ offers }): ReactElement {
   return (
