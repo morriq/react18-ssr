@@ -90,7 +90,8 @@ router.use(
 router.get("*", (request, response, next) => {
   const { template, bundle } = response.locals;
 
-  const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
+  const [startDocument, bodyEndTag, endDocument] =
+    template.split(/(\<\/body\>)/);
 
   const route = bundle.routes.find((route) => matchPath(request.path, route));
 
@@ -106,7 +107,6 @@ router.get("*", (request, response, next) => {
       }
 
       response.type("html").write(startDocument);
-      response.write(bodyTag);
 
       return route
         .afterHeadersResponse(request, beforeHeadersData)
@@ -119,9 +119,12 @@ router.get("*", (request, response, next) => {
           stream.on("error", (error) => {
             console.error(error);
             response.write("failed serving html");
+            response.write(bodyEndTag);
             response.end(endDocument);
           });
           stream.on("end", () => {
+            response.write(bodyEndTag);
+
             response.end(endDocument);
           });
         });

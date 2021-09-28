@@ -62,7 +62,6 @@ module.exports = () => {
         IS_BROWSER: true,
       }),
       new HtmlWebpackPlugin({
-        inject: "head",
         template: resolve(__dirname, "src/template.ejs"),
         filename: "template.html",
       }),
