@@ -3,13 +3,16 @@ const { join } = require("path");
 const { pipeToNodeWritable } = require("react-dom/server");
 
 const render = ({ template, response, bundle }) => {
-  const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
+    const [startDocument, bodyEndTag, endDocument] =
+    template.split(/(\<\/body\>)/);
+
   let didError = false;
   const { startWriting, abort } = pipeToNodeWritable(
     bundle.render(),
     response,
     {
       onCompleteAll() {
+        response.write(bodyEndTag);
         response.write(endDocument);
       },
       onReadyToStream() {
