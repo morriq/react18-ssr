@@ -1,11 +1,8 @@
 import { StaticRouter } from "react-router-dom";
 import App from "src/App";
 import clientRoutes from "src/routes";
-import { afterHeadersResponse, beforeHeadersResponse } from "src/routes/Home";
-import {
-  afterHeadersResponse as offerAfterHeadersResponse,
-  beforeHeadersResponse as offerBeforeHeadersResponse,
-} from "src/routes/Offer";
+import * as Home from "src/routes/Home";
+import * as Offer from "src/routes/Offer";
 
 interface Properties {
   location: string;
@@ -32,13 +29,13 @@ function render({ state, location }: Properties) {
 const prefetchRoutes = [
   {
     filename: "Home",
-    afterHeadersResponse,
-    beforeHeadersResponse,
+    afterHeadersResponse: Home.afterHeadersResponse,
+    beforeHeadersResponse: Home.beforeHeadersResponse,
   },
   {
     filename: "Offer",
-    afterHeadersResponse: offerAfterHeadersResponse,
-    beforeHeadersResponse: offerBeforeHeadersResponse,
+    afterHeadersResponse: Offer.afterHeadersResponse,
+    beforeHeadersResponse: Offer.beforeHeadersResponse,
   },
 ];
 
