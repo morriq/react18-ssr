@@ -13,7 +13,9 @@ function render({ state, location }: Properties) {
       <script
         dangerouslySetInnerHTML={{
           __html: `
-      window.INITIAL_STATE = ${JSON.stringify(state).replace(/</g, "\\u003c")}
+      window.onload = () => application.bootstrap({
+        state: ${JSON.stringify(state).replace(/</g, "\\u003c")},
+      });
       `,
         }}
       />
