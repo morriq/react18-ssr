@@ -77,10 +77,21 @@ function developmentMode() {
       ({ name }) => name === "server"
     );
 
-    const bundle = _eval(
-      outputFileSystem.readFileSync(join(outputPath, "server.js"), "utf-8"),
-      true
-    );
+    const context = {
+      require(module) {
+        let content;
+
+        try {
+          require.resolve(module);
+          content = require(module);
+        } catch (e) {
+          content = _eval(outputFileSystem.readFileSync(join(outputPath, module), 'utf-8'), context);
+        }
+        return content;
+      },
+    };
+
+    const bundle = _eval(outputFileSystem.readFileSync(join(outputPath, 'server.js'), 'utf-8'), context);
 
     const template = outputFileSystem.readFileSync(
       join(outputPath, "template.html"),
