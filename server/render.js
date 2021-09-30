@@ -99,7 +99,7 @@ router.get("*", (request, response, next) => {
   const [startDocument, bodyTag, endDocument] = template.split(/(\<body.*?\>)/);
 
   route
-    .beforeHeadersResponse(request, response)
+    .beforeHeadersResponse(request, response, matchPath(request.path, route))
     .then((beforeHeadersData) => {
       if (response.headersSent) {
         return;
