@@ -45,6 +45,7 @@ function developmentMode() {
       );
       
       const context = {
+        process,
         require(module) {
           let content;
 
